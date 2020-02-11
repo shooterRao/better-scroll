@@ -1,154 +1,108 @@
 # better-scroll
-[![npm](https://img.shields.io/npm/v/better-scroll.svg?style=flat-square)](https://www.npmjs.com/package/better-scroll)
 
-inspired by iscroll, and it has a better scroll perfermance https://ustbhuangyi.github.io/better-scroll/
+[![npm version](https://img.shields.io/npm/v/better-scroll.svg)](https://www.npmjs.com/package/better-scroll) [![npm next Version](https://badgen.net/npm/v/better-scroll/next)](https://www.npmjs.com/package/better-scroll) [![downloads](https://img.shields.io/npm/dm/better-scroll.svg)](https://www.npmjs.com/package/better-scroll) [![Build Status](https://travis-ci.org/ustbhuangyi/better-scroll.svg?branch=master)](https://travis-ci.org/ustbhuangyi/better-scroll)  [![Package Quality](http://npm.packagequality.com/shield/better-scroll.svg)](http://packagequality.com/#?package=better-scroll) [![codecov.io](http://codecov.io/github/ustbhuangyi/better-scroll/coverage.svg?branch=master)](http://codecov.io/github/ustbhuangyi/better-scroll)
 
-## 立即使用
+[中文文档](https://github.com/ustbhuangyi/better-scroll/blob/master/README_zh-CN.md)
 
-```HTML
-<body>
-  <div id="wrapper">
-    <ul>
-	   <li>...</li>
-	   <li>...</li>
-	   ...
-    </ul>
-  </div>
-<script type="text/javascript" src="better-scroll.js"></script>
-<script type="text/javascript">
-  new BScroll(document.getElementById('wrapper'));
-</script>
-</body>
+[1.x Docs](https://ustbhuangyi.github.io/better-scroll/#/)
+
+[2.x Docs](https://better-scroll.github.io/docs/en-US/)
+
+> **Note**: The following code is the syntax of `2.x`.
+
+# Install
+
+```bash
+npm install better-scroll -S # install 1.x
+npm install better-scroll@next -S # install 2.x，with full-featured plugin.
 ```
 
-搞定 !
+or include it directly via CDN
 
-## 通过npm引入
-
-安装better-scroll
-
-```shell
-npm install better-scroll --save-dev
+```html
+<script src="https://cdn.jsdelivr.net/npm/better-scroll"></script>
 ```
-引入better-scroll
+
+## What is BetterScroll ?
+
+BetterScroll is a plugin which is aimed at solving scrolling circumstances on the mobile side (PC supported already). The core is inspired by the implementation of [iscroll](https://github.com/cubiq/iscroll), so the APIs of BetterScroll are compatible with iscroll on the whole. What's more, BetterScroll also extends some features and optimizes for performance based on iscroll.
+
+BetterScroll is implemented with plain JavaScript, which means it's dependency free.
+
+## Getting started
+
+The most common application scenario of BetterScroll is list scrolling. Let's see its HTML:
+
+```html
+<div class="wrapper">
+  <ul class="content">
+    <li>...</li>
+    <li>...</li>
+    ...
+  </ul>
+  <!-- you can put some other DOMs here, it won't affect the scrolling
+</div>
+```
+
+In the code above, BetterScroll is applied to the outer `wrapper` container, and the scrolling part is `content` element. Pay attention that BetterScroll only handles the scroll of the first child element (content) of the container (`wrapper`), which means other elements will be ignored.
+
+The simplest initialization code is as follow:
 
 ```javascript
-import BScroll from 'better-scroll'
+import BScroll from '@better-scroll/core'
+let wrapper = document.querySelector('.wrapper')
+let scroll = new BScroll(wrapper)
 ```
 
->如果不支持import, 请使用
+BetterScroll provides a class whose first parameter is a plain DOM object when instantiated. Certainly, BetterScroll inside would try to use querySelector to get the DOM object.
 
-```javascript
-var BScroll = require('better-scroll')
-```
+## The principle of scrolling
 
-## DEMO
-better-scroll 的源码是基于 Webpack 构建的
+Many developers have used BetterScroll, but the most common problem they have met is:
 
-首先，clone项目源码
+> I have initiated BetterScroll, but the content can't scroll.
 
-```shell
-git clone https://github.com/ustbhuangyi/better-scroll.git
-```
+The phenomenon is 'the content can't scroll' and we need to figure out the root cause. Before that, let's take a look at the browser's scrolling principle: everyone can see the browser's scroll bar. When the height of the page content exceeds the viewport height, the vertical scroll bar will appear; When the width of page content exceeds the viewport width, the horizontal bar will appear. That is to say, when the viewport can't display all the content, the browser would guide the user to scroll the screen with scroll bar to see the rest of content.
 
-安装依赖
+The principle of BetterScroll is samed as the browser. We can feel about this more obviously using a picture:
 
-```shell
-cd better-scroll
-npm install
-```
+![布局](https://raw.githubusercontent.com/ustbhuangyi/better-scroll/master/packages/vuepress-docs/docs/.vuepress/public/assets/images/schematic.png)
 
-测试demo页
+The green part is the wrapper, also known as the parent container, which has **fixed height**. The yellow part is the content, which is **the first child element** of the parent container and whose height would grow with the size of its content. Then, when the height of the content doesn't exceed the height of the parent container, the content would not scroll. Once exceeded, the content can be scrolled. That is the principle of BetterScroll.
 
-```shell
-npm run dev
-```
+## Plugins
 
-打开浏览器访问如下地址, 查看效果
+Enhance the ability of BetterScroll core scroll through plugins, such as
 
-> localhost:9090
+```js
+import BScroll from '@better-scroll/core'
+import PullUp from '@better-scroll/pull-up'
 
-## Options 参数
-
-Example:
-
-```javascript
-let scroll = new BScroll(document.getElementById('wrapper'), {
-  startX: 0,
-  startY: 0
+let bs = new BScroll('.wrapper', {
+  pullUpLoad: true
 })
 ```
 
-Options List:
+Please see for details, [Plugins](https://better-scroll.github.io/docs/en-US/plugins/).
 
-- startX: `0` 开始的X轴位置
-- startY: `0` 开始的Y轴位置
-- scrollY: `true` 滚动方向
-- click: `true` 是否启用click事件
-- directionLockThreshold: `5`
-- momentum: `true` 是否开启拖动惯性
-- bounce: `true` 是否启用弹力动画效果，关掉可以加速
-- selectedIndex: `0` 
-- rotate: `25` 
-- wheel: `false` 该属性是给 picker 组件使用的，普通的列表滚动不需要配置
-- snap: `false` 是否开启捕捉元素，当为 true 时，捕捉的元素会根据可滚动的位置和滚动区域计算得到可滑动几页。
-- snapLoop: `false` 是否创建当前滚动元素子集的拷贝
-- snapThreshold: `0.1` 滑动的长度限制，只有大于这个距离才会触发事件
-- swipeTime: `2500` swipe 持续时间
-- bounceTime: `700` 弹力动画持续的毫秒数
-- adjustTime: `400`
-- swipeBounceTime: `1200`
-- deceleration: `0.001` 滚动动量减速越大越快，建议不大于0.01
-- momentumLimitTime: `300` 惯性拖动的回弹时间
-- momentumLimitDistance: `15` 惯性拖动的回弹距离
-- resizePolling: `60` 重新调整窗口大小时，重新计算better-scroll的时间间隔
-- probeType: `1` 监听事件的触发时间，1为即时触发，3为延迟到事件完毕后触发
-- preventDefault: `true` 是否阻止默认事件
-- preventDefaultException: `{ tagName: /^(INPUT|TEXTAREA|BUTTON|SELECT)$/ }` 阻止默认事件
-- HWCompositing: `true` 是否启用硬件加速
-- useTransition: `true` 是否使用CSS3的Transition属性，否则使用-requestAnimationFram代替
-- useTransform: `true` 是否使用CSS3的Transform属性
-- probeType: `1` 滚动的时候会派发scroll事件，会截流。`2`滚动的时候实时派发scroll事件，不会截流。 `3`除了实时派发scroll事件，在swipe的情况下仍然能实时派发scroll事件
+## Using BetterScroll with MVVM frameworks
 
-## Events 事件
+I wrote an article [When BetterScroll meets Vue](https://zhuanlan.zhihu.com/p/27407024) (in Chinese). I also hope that developers can contribute to share the experience of using BetterScroll with other frameworks.
 
-Example:
+A fantastic mobile ui lib implement by Vue: [cube-ui](https://github.com/didi/cube-ui/)
 
-```javascript
-let scroll = new BScroll(document.getElementById('wrapper'),{
-   probeType: 3
-})
+## Using BetterScroll in the real project
 
-scroll.on('scroll', (pos) => {
-  console.log(pos.x + '~' + posx.y)
-  ...
-})
-```
+If you want to learn how to use BetterScroll in the real project，you can learn my two practical courses(in Chinese)。
 
-Events 列表
+[High imitating starvation takeout practical course base on Vue.js](https://coding.imooc.com/class/74.html)
 
-- beforeScrollStart - 滚动开始之前触发
-- scrollStart - 滚动开始时触发
-- scroll - 滚动时触发
-- scrollCancel - 取消滚动时触发
-- scrollEnd - 滚动结束时触发
-- flick - 触发了 fastclick 时的回调函数
-- refresh - 当 better-scroll 刷新时触发
-- destroy - 销毁 better-scroll 实例时触发
+[Project demo address](http://ustbhuangyi.com/sell/)
 
+![QR Code](https://qr.api.cli.im/qr?data=http%253A%252F%252Fustbhuangyi.com%252Fsell%252F%2523%252Fgoods&level=H&transparent=false&bgcolor=%23ffffff&forecolor=%23000000&blockpixel=12&marginblock=1&logourl=&size=280&kid=cliim&key=686203a49c4613080b5b3004323ff977)
 
-## 派发滚动
+[Music App advanced practical course base on Vue.js](http://coding.imooc.com/class/107.html)
 
-- scrollTo(x, y, time, easing) 滚动到某个位置，x,y 代表坐标，time 表示动画时间，easing 表示缓动函数
+[Project demo address](http://ustbhuangyi.com/music/)
 
-Example:
-
-```javascript
-let scroll = new BScroll(document.getElementById('wrapper'))
-scroll.scrollTo(0, 500)
-...
-```
-- scrollToElement(el, time, offsetX, offsetY, easing) 滚动到
-  某个元素，el（必填）表示 dom 元素，time 表示动画，offsetX 和 offsetY 表示坐标偏移量，easing 表示缓动函数
-
-
+![QR Code](https://qr.api.cli.im/qr?data=http%253A%252F%252Fustbhuangyi.com%252Fmusic%252F&level=H&transparent=false&bgcolor=%23ffffff&forecolor=%23000000&blockpixel=12&marginblock=1&logourl=&size=280&kid=cliim&key=731bbcc2b490454d2cc604f98539952c)
